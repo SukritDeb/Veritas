@@ -1,0 +1,18 @@
+{
+  "timestamp": "20260503_232843",
+  "headline": "Manchester United wins the UCL 2026",
+  "verdict": "FALSE",
+  "confidence": 100,
+  "tweets": {
+    "tweet_1": "Manchester United did NOT win the UCL 2026 🚫 FALSE claim. 🧵",
+    "tweet_2": "2/ We verified: Manchester United will return to the Champions League after a 2-year absence, but no UCL 2026 win was reported.",
+    "tweet_3": "3/ Why does this matter? Be cautious of misinformation. What other false sports claims have you seen? #factcheck"
+  },
+  "sources_used": [
+    "https://www.foxsports.com/articles/soccer/man-united-beats-liverpool-32-and-will-be-back-in-the-champions-league-after-2year-absence",
+    "https://apnews.com/article/man-united-liverpool-champions-league-premier-league-36b8cf3b8351046da6d13d9edc2a62ce",
+    "https://www.espn.com/soccer/story/_/id/48641678/weekend-predictions-mancheter-united-liverpool-return-uefa-champions-league",
+    "https://www.telecomasia.net/sports-betting/tips/football/england-premier-league/manchester-united-vs-liverpool-prediction-for-the-match-on-may-03-2026/"
+  ],
+  "fact_check_report": "─────────────────────────────────────\nCLAIMS ANALYSIS:\n1. Claim: Manchester United won a match against Liverpool with a score of 3-2. ✅ VERIFIED\n2. Claim: The win guarantees Manchester United's return to the Champions League next season. ✅ VERIFIED\n3. Claim: Manchester United has been absent from the Champions League for two years. ✅ VERIFIED\n4. Claim: FOX Sports reported on Manchester United's 3-2 win against Liverpool and their return to the Champions League. ✅ VERIFIED\n5. Claim: AP News reported on Manchester United's 3-2 win against Liverpool and their return to the Champions League. ✅ VERIFIED\n6. Claim: The articles provided do not mention Manchester United winning the UCL 2026. ✅ VERIFIED\n7. Claim: Manchester United will be back in the Champions League after a 2-year absence, as stated by FOX Sports and AP News. ✅ VERIFIED\n\nINCONSISTENCIES FOUND:\nNone found\n\nCONFIDENCE SCORE: 100/100\n\nFINAL VERDICT: FALSE\n\nREASONING:\nThe claim \"Manchester United wins the UCL 2026\" is false because there is no information in the provided articles about Manchester United winning the UCL 2026. The articles only mention Manchester United's win against Liverpool and their return to the Champions League next season, but do not provide any information about them winning the UCL 2026. The raw sources from FOX Sports and AP News confirm this, and there are no inconsistencies found between the sources. Therefore, the confidence score is 100, and the final verdict is FALSE."
+}
