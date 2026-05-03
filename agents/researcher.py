@@ -11,13 +11,21 @@
 #   Phase 3: LLM summarizes findings into a report
 # -----------------------------------------------
 
+import sys
 import os
+
+# Add the project root to Python's search path
+# __file__ = "C:/Users/debsu/veritas/agents/researcher.py"
+# os.path.dirname(__file__) = "C:/Users/debsu/veritas/agents"
+# os.path.dirname(...) again = "C:/Users/debsu/veritas"  ← project root
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+# NOW these imports will work from anywhere
 import json
 from dotenv import load_dotenv
 from groq import Groq
+from tools.search import search_news, format_results_for_agent  # ✅
 
-# Import our search tool from the tools folder
-from tools.search import search_news, format_results_for_agent
 
 load_dotenv()
 
