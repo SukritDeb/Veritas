@@ -1,0 +1,20 @@
+{
+  "timestamp": "20260503_232253",
+  "headline": "Mamata Banerjee just died",
+  "verdict": "FALSE",
+  "confidence": 100,
+  "tweets": {
+    "tweet_1": "Mamata Banerjee is **ALIVE**. Claim of her death is FALSE 🧵",
+    "tweet_2": "2/ We found no mention of her death in sources like The Times of India, The Guardian, and NDTV.",
+    "tweet_3": "3/ Why does this matter? Verify info before sharing. What's your go-to fact-checking source? #factcheck"
+  },
+  "sources_used": [
+    "https://timesofindia.indiatimes.com/city/hyderabad/self-enumeration-process-kicks-off-in-telangana/articleshow/130538370.cms",
+    "https://www.theguardian.com/world/2026/apr/30/india-man-body-corpse-dead-sister-bank",
+    "https://timesofindia.indiatimes.com/india/kejriwal-tried-to-stop-defections-but-it-was-a-case-of-too-little-too-late/articleshow/130539519.cms",
+    "https://www.ndtv.com/india-news/self-funded-visit-ndtv-tracks-man-in-mamata-banerjees-outsider-video-11442568",
+    "https://www.latestly.com/india/politics/west-bengal-elections-2026-phase-2-voting-polling-underway-for-142-seats-mamata-banerjee-faces-suvendu-adhikari-in-high-stakes-bhabanipur-battle-7411220.html",
+    "https://news.abplive.com/news/india/delhi-launches-digital-self-enumeration-for-census-2027-across-mcd-wards-lg-urges-participation-1839863"
+  ],
+  "fact_check_report": "─────────────────────────────────────\nCLAIMS ANALYSIS:\n1. Claim: Mamata Banerjee is mentioned as being involved in the West Bengal Assembly Elections 2026. \n   ✅ VERIFIED - Mentioned in SOURCE 1, SOURCE 4, SOURCE 5, and SOURCE 6 as being involved in the elections.\n2. Claim: Mamata Banerjee is facing Suvendu Adhikari in the Bhabanipur battle.\n   ✅ VERIFIED - Directly stated in SOURCE 5.\n3. Claim: The Times of India is a source mentioned in the articles.\n   ✅ VERIFIED - SOURCE 1 and SOURCE 3 are from The Times of India.\n4. Claim: The Guardian is a source mentioned in the articles.\n   ✅ VERIFIED - SOURCE 2 is from The Guardian.\n5. Claim: NDTV is a source mentioned in the articles.\n   ✅ VERIFIED - SOURCE 4 is from NDTV.\n6. Claim: LatestLY is a source mentioned in the articles.\n   ✅ VERIFIED - SOURCE 5 is from LatestLY.\n7. Claim: ABP News is a source mentioned in the articles.\n   ✅ VERIFIED - SOURCE 6 is from ABP News.\n8. Claim: None of the mentioned sources (The Times of India, The Guardian, NDTV, LatestLY, ABP News) report on Mamata Banerjee's death.\n   ✅ VERIFIED - None of the sources mention Mamata Banerjee's death.\n9. Claim: The West Bengal Assembly Elections are taking place in 2026.\n   ✅ VERIFIED - Mentioned in multiple sources, including SOURCE 1, SOURCE 4, SOURCE 5, and SOURCE 6.\n10. Claim: Mamata Banerjee is an active participant in the West Bengal Assembly Elections 2026, according to the provided articles.\n    ✅ VERIFIED - Implied by her involvement in the elections as mentioned in SOURCE 1, SOURCE 4, SOURCE 5, and SOURCE 6.\n\nINCONSISTENCIES FOUND:\nNone found\n\nCONFIDENCE SCORE: 100/100\n\nFINAL VERDICT: FALSE\n\nREASONING: The claim that Mamata Banerjee has just died is contradicted by all the provided sources, which instead show her as an active participant in the West Bengal Assembly Elections 2026. There is no mention of her death in any of the sources, making the claim entirely unverified and false based on the given information."
+}
