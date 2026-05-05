@@ -1,39 +1,17 @@
-# agents/researcher.py
-# -----------------------------------------------
-# AGENT 1: THE RESEARCHER
-#
-# Job: Take a headline → search the web → return
-#      a structured research report for the Fact-Checker
-#
-# It has two phases:
-#   Phase 1: LLM decides the BEST search query
-#   Phase 2: Tool fetches real articles
-#   Phase 3: LLM summarizes findings into a report
-# -----------------------------------------------
-
 import sys
 import os
 
-# Add the project root to Python's search path
-# __file__ = "C:/Users/debsu/veritas/agents/researcher.py"
-# os.path.dirname(__file__) = "C:/Users/debsu/veritas/agents"
-# os.path.dirname(...) again = "C:/Users/debsu/veritas"  ← project root
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-# NOW these imports will work from anywhere
 import json
 from dotenv import load_dotenv
 from groq import Groq
-from tools.search import search_news, format_results_for_agent  # ✅
-
+from tools.search import search_news, format_results_for_agent  
 
 load_dotenv()
 
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
-
-# ── SYSTEM PROMPT ────────────────────────────────
-# This is what makes it a "Researcher" not just any LLM
 RESEARCHER_SYSTEM_PROMPT = """
 You are an expert research analyst for a fact-checking organization.
 
@@ -56,7 +34,6 @@ When given raw articles, synthesize them into a structured report with:
 Be factual and concise. Cite article titles when referencing them.
 """
 
-
 def generate_search_queries(headline: str) -> list[str]:
     """
     Phase 1: Ask the LLM what to search for.
@@ -71,7 +48,7 @@ def generate_search_queries(headline: str) -> list[str]:
     Good query: "NASA privatization news 2025"    ← broader context
     """
 
-    print("  🧠 Agent thinking: what should I search for?")
+    print("Agent thinking: what should I search for?")
 
     response = client.chat.completions.create(
         model="llama-3.3-70b-versatile",
@@ -79,21 +56,19 @@ def generate_search_queries(headline: str) -> list[str]:
             {"role": "system", "content": RESEARCHER_SYSTEM_PROMPT},
             {"role": "user",   "content": f"Generate search queries for this headline: {headline}"}
         ],
-        temperature=0.2,    # low — we want consistent, logical queries
+        temperature=0.2, 
         max_tokens=200
     )
 
     raw = response.choices[0].message.content.strip()
 
-    # Parse the JSON the LLM returned
     try:
         parsed = json.loads(raw)
         queries = parsed["queries"]
-        print(f"  🔎 Queries chosen: {queries}")
+        print(f"Queries chosen: {queries}")
         return queries
     except json.JSONDecodeError:
-        # If LLM didn't return clean JSON, fall back to the headline itself
-        print("  ⚠️ JSON parse failed, using headline as fallback query")
+        print("JSON parse failed, using headline as fallback query")
         return [headline]
 
 
@@ -103,7 +78,7 @@ def synthesize_research(headline: str, raw_articles: str) -> str:
     to write a structured research report.
     """
 
-    print("  📝 Agent synthesizing findings into report...")
+    print("Agent synthesizing findings into report...")
 
     synthesis_prompt = f"""
 HEADLINE TO VERIFY: {headline}
@@ -138,20 +113,17 @@ def run_researcher(headline: str) -> dict:
     """
 
     print(f"\n{'='*60}")
-    print(f"🔍 RESEARCHER AGENT STARTING")
-    print(f"📰 Headline: {headline}")
+    print(f"RESEARCHER AGENT STARTING")
+    print(f"Headline: {headline}")
     print(f"{'='*60}\n")
 
-    # ── PHASE 1: Generate smart search queries ──
     queries = generate_search_queries(headline)
 
-    # ── PHASE 2: Actually search the web ──────────
     all_articles = []
     for query in queries:
         articles = search_news(query, num_results=3)  # 3 per query = 6 total
         all_articles.extend(articles)
 
-    # Remove duplicates based on URL
     seen_urls = set()
     unique_articles = []
     for article in all_articles:
@@ -159,17 +131,14 @@ def run_researcher(headline: str) -> dict:
             seen_urls.add(article["url"])
             unique_articles.append(article)
 
-    print(f"  📚 Total unique articles collected: {len(unique_articles)}")
+    print(f"Total unique articles collected: {len(unique_articles)}")
 
-    # Format articles into text for the LLM
     formatted = format_results_for_agent(unique_articles)
 
-    # ── PHASE 3: LLM synthesizes a report ─────────
     report = synthesize_research(headline, formatted)
 
     print(f"\n✅ RESEARCHER AGENT DONE\n")
 
-    # Return everything — Fact-Checker needs both
     return {
         "headline"        : headline,
         "research_report" : report,
@@ -177,20 +146,16 @@ def run_researcher(headline: str) -> dict:
         "queries_used"    : queries
     }
 
-
-# -----------------------------------------------
-# TEST THIS AGENT DIRECTLY
-# -----------------------------------------------
 if __name__ == "__main__":
     headline = "BREAKING: Scientists confirm teleportation of humans achieved in secret Swiss lab"
     
     result = run_researcher(headline)
     
     print("\n" + "="*60)
-    print("📋 RESEARCH REPORT:")
+    print("RESEARCH REPORT:")
     print("="*60)
     print(result["research_report"])
     print("\n" + "="*60)
-    print(f"🔗 Sources used: {len(result['raw_articles'])}")
+    print(f"Sources used: {len(result['raw_articles'])}")
     for a in result["raw_articles"]:
         print(f"  • {a['title']}")

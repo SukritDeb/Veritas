@@ -1,15 +1,3 @@
-# main.py
-# ═══════════════════════════════════════════════════════
-# VERITAS-AGENT — THE ORCHESTRATOR
-#
-# This is the single entry point for the entire system.
-# It wires all three agents together into one pipeline.
-#
-# Usage:
-#   python main.py
-#   python main.py --headline "Your headline here"
-# ═══════════════════════════════════════════════════════
-
 import sys
 import os
 import time
@@ -17,15 +5,11 @@ import argparse
 import json
 from datetime import datetime
 
-# Add project root to path (same fix as other agents)
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from agents.researcher   import run_researcher
 from agents.fact_checker import run_fact_checker
 from agents.editor       import run_editor
-
-
-# ── DISPLAY HELPERS ─────────────────────────────────────
 
 def print_banner():
     print("""
@@ -83,21 +67,18 @@ def print_pipeline_summary(
                     PIPELINE COMPLETE
 {'═'*60}
 
-📰 HEADLINE:
+HEADLINE:
    {headline}
 
 {color}{emoji} VERDICT     : {verdict}{reset}
-📊 CONFIDENCE : {score}/100
-⏱️  TOTAL TIME : {total_time:.1f} seconds
-🔗 SOURCES    : {len(researcher_out['raw_articles'])} articles used
-🔎 QUERIES    : {', '.join(researcher_out['queries_used'])}
+CONFIDENCE : {score}/100
+TOTAL TIME : {total_time:.1f} seconds
+SOURCES    : {len(researcher_out['raw_articles'])} articles used
+QUERIES    : {', '.join(researcher_out['queries_used'])}
 
 {'─'*60}
 {editor_out['formatted_output']}
 """)
-
-
-# ── PIPELINE STAGES ─────────────────────────────────────
 
 def stage_1_research(headline: str) -> dict | None:
     """
@@ -119,7 +100,6 @@ def stage_1_research(headline: str) -> dict | None:
         print(f"\n  Error details: {str(e)}")
         return None
 
-
 def stage_2_fact_check(researcher_output: dict) -> dict | None:
     """
     Runs the Fact-Checker Agent.
@@ -139,7 +119,6 @@ def stage_2_fact_check(researcher_output: dict) -> dict | None:
         print_step(2, f"FACT-CHECKER AGENT — FAILED: {e}", "FAILED")
         print(f"\n  Error details: {str(e)}")
         return None
-
 
 def stage_3_edit(fact_checker_output: dict) -> dict | None:
     """
@@ -161,9 +140,6 @@ def stage_3_edit(fact_checker_output: dict) -> dict | None:
         print(f"\n  Error details: {str(e)}")
         return None
 
-
-# ── SAVE RESULTS ────────────────────────────────────────
-
 def save_results(
     headline        : str,
     researcher_out  : dict,
@@ -175,7 +151,6 @@ def save_results(
     Useful for reviewing past analyses.
     """
 
-    # Create outputs/ folder if it doesn't exist
     os.makedirs("outputs", exist_ok=True)
 
     # Filename based on timestamp
@@ -201,11 +176,8 @@ def save_results(
     with open(filename, "w", encoding="utf-8") as f:
         json.dump(result, f, indent=2, ensure_ascii=False)
 
-    print(f"💾 Results saved to: {filename}")
+    print(f"Results saved to: {filename}")
     return filename
-
-
-# ── MAIN PIPELINE ────────────────────────────────────────
 
 def run_pipeline(headline: str, save: bool = True) -> dict | None:
     """
@@ -222,42 +194,36 @@ def run_pipeline(headline: str, save: bool = True) -> dict | None:
 
     print_banner()
 
-    print(f"📰 Input Headline:")
+    print(f"Input Headline:")
     print(f"   \"{headline}\"")
-    print(f"\n🕐 Started at: {datetime.now().strftime('%H:%M:%S')}")
+    print(f"\nStarted at: {datetime.now().strftime('%H:%M:%S')}")
 
     total_start = time.time()
 
-    # ── STAGE 1: RESEARCH ───────────────────────────────
     researcher_out = stage_1_research(headline)
 
     if researcher_out is None:
-        print("\n💥 Pipeline stopped: Researcher Agent failed.")
+        print("\nPipeline stopped: Researcher Agent failed.")
         print("   Check your TAVILY_API_KEY in .env")
         return None
 
-    # ── STAGE 2: FACT-CHECK ─────────────────────────────
     fact_checker_out = stage_2_fact_check(researcher_out)
 
     if fact_checker_out is None:
-        print("\n💥 Pipeline stopped: Fact-Checker Agent failed.")
+        print("\nPipeline stopped: Fact-Checker Agent failed.")
         print("   Check your GROQ_API_KEY in .env")
         return None
 
-    # ── CONFIDENCE GATE ─────────────────────────────────
-    # If confidence is extremely low, warn before continuing
     if fact_checker_out["confidence_score"] < 20:
-        print("\n⚠️  WARNING: Confidence score is very low (<20)")
+        print("\nWARNING: Confidence score is very low (<20)")
         print("   The Editor will proceed but results may be unreliable.")
 
-    # ── STAGE 3: EDIT ───────────────────────────────────
     editor_out = stage_3_edit(fact_checker_out)
 
     if editor_out is None:
-        print("\n💥 Pipeline stopped: Editor Agent failed.")
+        print("\nPipeline stopped: Editor Agent failed.")
         return None
 
-    # ── FINAL SUMMARY ───────────────────────────────────
     total_time = time.time() - total_start
 
     print_pipeline_summary(
@@ -268,7 +234,6 @@ def run_pipeline(headline: str, save: bool = True) -> dict | None:
         total_time
     )
 
-    # ── SAVE RESULTS ────────────────────────────────────
     if save:
         save_results(
             headline,
@@ -283,28 +248,21 @@ def run_pipeline(headline: str, save: bool = True) -> dict | None:
         "editor"      : editor_out
     }
 
-
-# ── ENTRY POINT ─────────────────────────────────────────
-
 def get_headline_from_user() -> str:
     """Interactive prompt if no headline passed via CLI."""
     print("\n" + "─"*60)
     print("Enter a news headline to verify.")
     print("─"*60)
-    headline = input("📰 Headline: ").strip()
+    headline = input("Headline: ").strip()
 
     if not headline:
-        print("❌ No headline entered. Exiting.")
+        print("No headline entered. Exiting.")
         sys.exit(1)
 
     return headline
 
 
 if __name__ == "__main__":
-
-    # ── ARGUMENT PARSER ─────────────────────────────────
-    # Lets you run:  python main.py --headline "some news"
-    # Or just:       python main.py   (interactive mode)
 
     parser = argparse.ArgumentParser(
         description="Veritas-Agent: AI News Verification System"
@@ -324,11 +282,9 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    # Get headline from CLI arg or interactive input
     if args.headline:
         headline = args.headline
     else:
         headline = get_headline_from_user()
 
-    # Run the pipeline!
     run_pipeline(headline, save=not args.no_save)

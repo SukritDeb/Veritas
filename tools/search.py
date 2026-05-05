@@ -1,19 +1,10 @@
-# tools/search.py
-# -----------------------------------------------
-# THE SEARCH TOOL
-# This is NOT an agent — it's just a function.
-# Agents CALL this function when they need web data.
-# -----------------------------------------------
-
 import os
 from dotenv import load_dotenv
 from tavily import TavilyClient
 
 load_dotenv()
 
-# Initialize Tavily client once (reused across calls)
 tavily = TavilyClient(api_key=os.getenv("TAVILY_API_KEY"))
-
 
 def search_news(query: str, num_results: int = 5) -> list[dict]:
     """
@@ -32,14 +23,14 @@ def search_news(query: str, num_results: int = 5) -> list[dict]:
         }
     """
 
-    print(f"  🌐 Searching web for: '{query}'")
+    print(f"Searching web for: '{query}'")
 
     response = tavily.search(
         query=query,
-        search_depth="advanced",    # thorough search (vs "basic")
+        search_depth="advanced",    
         max_results=num_results,
-        include_answer=False,       # we just want raw articles
-        topic="news"                # focus on news sources
+        include_answer=False,     
+        topic="news"               
     )
 
     # Tavily returns a dict with a "results" key
@@ -52,7 +43,7 @@ def search_news(query: str, num_results: int = 5) -> list[dict]:
             "content": article.get("content", "No content available")
         })
 
-    print(f"  ✅ Found {len(results)} articles\n")
+    print(f"Found {len(results)} articles\n")
     return results
 
 
@@ -78,10 +69,6 @@ Summary : {article['content']}
 """
     return formatted.strip()
 
-
-# -----------------------------------------------
-# QUICK TEST — run this file directly to test
-# -----------------------------------------------
 if __name__ == "__main__":
     test_results = search_news("teleportation of humans 2025")
     print(format_results_for_agent(test_results))

@@ -1,15 +1,3 @@
-# agents/fact_checker.py
-# -----------------------------------------------
-# AGENT 2: THE FACT-CHECKER
-#
-# Job: Takes the Researcher's output and:
-#   1. Verifies each claim against raw sources
-#   2. Flags anything not backed by evidence
-#   3. Detects contradictions between sources
-#   4. Produces a confidence score (0-100)
-#   5. Outputs a clean verified report for Editor
-# -----------------------------------------------
-
 import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -21,10 +9,6 @@ load_dotenv()
 
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
-
-# ── SYSTEM PROMPT ────────────────────────────────────────
-# Notice this is VERY different from the Researcher's prompt.
-# Same LLM, completely different agent — because of this prompt.
 FACT_CHECKER_SYSTEM_PROMPT = """
 You are a ruthless, skeptical fact-checker at a world-class 
 investigative journalism organization.
@@ -88,7 +72,7 @@ def extract_claims(research_report: str) -> str:
     reasoning into smaller, more accurate steps.
     """
 
-    print("  🔬 Extracting verifiable claims from report...")
+    print("Extracting verifiable claims from report...")
 
     response = client.chat.completions.create(
         model="llama-3.3-70b-versatile",
@@ -102,7 +86,7 @@ def extract_claims(research_report: str) -> str:
                 "content": f"Extract all verifiable claims from this research report:\n\n{research_report}"
             }
         ],
-        temperature=0.1,    # very low — we want precise extraction
+        temperature=0.1,   
         max_tokens=800
     )
 
@@ -128,9 +112,7 @@ def verify_claims(
     This catches hallucinations the Researcher may have added.
     """
 
-    print("  🕵️  Cross-checking claims against raw sources...")
-
-    # Format raw articles for the prompt
+    print("Cross-checking claims against raw sources...")
     sources_text = ""
     for i, article in enumerate(raw_articles, 1):
         sources_text += f"""
@@ -163,7 +145,7 @@ The synthesis might have errors. The raw sources are truth.
             {"role": "system", "content": FACT_CHECKER_SYSTEM_PROMPT},
             {"role": "user",   "content": verification_prompt}
         ],
-        temperature=0.1,    # fact-checking needs consistency
+        temperature=0.1,  
         max_tokens=2000
     )
 
@@ -176,7 +158,6 @@ def parse_confidence_score(fact_check_report: str) -> int:
     Used by main.py to decide how to present results.
     """
     import re
-    # Look for pattern like "CONFIDENCE SCORE: 75/100"
     match = re.search(r'CONFIDENCE SCORE:\s*(\d+)/100', fact_check_report)
     if match:
         return int(match.group(1))
@@ -194,7 +175,7 @@ def parse_verdict(fact_check_report: str) -> str:
     )
     if match:
         return match.group(1)
-    return "UNVERIFIED"    # safe default
+    return "UNVERIFIED"    
 
 
 def run_fact_checker(researcher_output: dict) -> dict:
@@ -221,17 +202,15 @@ def run_fact_checker(researcher_output: dict) -> dict:
     """
 
     print(f"\n{'='*60}")
-    print(f"🕵️  FACT-CHECKER AGENT STARTING")
+    print(f"FACT-CHECKER AGENT STARTING")
     print(f"{'='*60}\n")
 
     headline        = researcher_output["headline"]
     research_report = researcher_output["research_report"]
     raw_articles    = researcher_output["raw_articles"]
 
-    # ── STEP 1: Extract claims from the research report ──
     claims = extract_claims(research_report)
 
-    # ── STEP 2: Verify claims against raw sources ────────
     fact_check_report = verify_claims(
         headline,
         research_report,
@@ -239,43 +218,34 @@ def run_fact_checker(researcher_output: dict) -> dict:
         claims
     )
 
-    # ── STEP 3: Parse key values from the report ─────────
     confidence_score = parse_confidence_score(fact_check_report)
     verdict          = parse_verdict(fact_check_report)
 
-    print(f"\n  📊 Confidence Score : {confidence_score}/100")
-    print(f"  ⚖️  Verdict          : {verdict}")
-    print(f"\n✅ FACT-CHECKER AGENT DONE\n")
+    print(f"\nConfidence Score : {confidence_score}/100")
+    print(f"Verdict          : {verdict}")
+    print(f"\nFACT-CHECKER AGENT DONE\n")
 
     return {
         "headline"          : headline,
         "fact_check_report" : fact_check_report,
         "confidence_score"  : confidence_score,
         "verdict"           : verdict,
-        "research_report"   : research_report   # pass through for Editor
+        "research_report"   : research_report  
     }
 
-
-# -----------------------------------------------
-# TEST THIS AGENT (runs Researcher first, then Fact-Checker)
-# -----------------------------------------------
 if __name__ == "__main__":
-    # We need the Researcher to run first
     from agents.researcher import run_researcher
 
     headline = "BREAKING: Scientists confirm teleportation of humans achieved in secret Swiss lab"
 
-    # Step 1: Run Researcher
     researcher_output = run_researcher(headline)
 
-    # Step 2: Run Fact-Checker on that output
     fact_checker_output = run_fact_checker(researcher_output)
 
-    # Print results
     print("\n" + "="*60)
-    print("📋 FACT-CHECK REPORT:")
+    print("FACT-CHECK REPORT:")
     print("="*60)
     print(fact_checker_output["fact_check_report"])
     print("\n" + "="*60)
-    print(f"📊 CONFIDENCE : {fact_checker_output['confidence_score']}/100")
-    print(f"⚖️  VERDICT    : {fact_checker_output['verdict']}")
+    print(f"CONFIDENCE : {fact_checker_output['confidence_score']}/100")
+    print(f"VERDICT    : {fact_checker_output['verdict']}")

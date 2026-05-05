@@ -1,15 +1,3 @@
-# agents/editor.py
-# -----------------------------------------------
-# AGENT 3: THE EDITOR
-#
-# Job: Takes verified facts from Fact-Checker and
-#      writes a 3-post Twitter/X thread that is:
-#      - Accurate (based on verified facts only)
-#      - Engaging (people actually want to read it)
-#      - On-brand (consistent voice and style)
-#      - Correctly sized (≤280 chars per tweet)
-# -----------------------------------------------
-
 import sys
 import os
 import re
@@ -20,13 +8,8 @@ from dotenv import load_dotenv
 from groq import Groq
 
 load_dotenv()
-
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
-
-# ── BRAND VOICE RULES ────────────────────────────
-# This is our "news verification" channel's personality.
-# Tweak this to change the entire tone of output.
 BRAND_VOICE = """
 CHANNEL: @VeritasCheck — a trusted news verification account
 
@@ -52,8 +35,6 @@ FORMATTING RULES:
 - Bold claims with CAPS sparingly
 """
 
-
-# ── SYSTEM PROMPT ────────────────────────────────
 EDITOR_SYSTEM_PROMPT = f"""
 You are a senior social media editor at a fact-checking news organization.
 
@@ -87,7 +68,7 @@ def generate_thread_draft(
     Gives the LLM full creative freedom within the rules.
     """
 
-    print("  ✍️  Generating thread draft...")
+    print("Generating thread draft...")
 
     prompt = f"""
 Write a 3-tweet thread for this verified news story:
@@ -111,22 +92,19 @@ Return only valid JSON.
             {"role": "system", "content": EDITOR_SYSTEM_PROMPT},
             {"role": "user",   "content": prompt}
         ],
-        temperature=0.7,    # ← higher! we want creative writing
+        temperature=0.7, 
         max_tokens=1000
     )
 
     raw = response.choices[0].message.content.strip()
-
-    # Clean up JSON (LLM sometimes adds markdown code fences)
     raw = re.sub(r"```json|```", "", raw).strip()
 
     try:
         return json.loads(raw)
     except json.JSONDecodeError:
-        # If JSON parse fails, return a fallback structure
-        print("  ⚠️  JSON parse failed — using fallback")
+        print("JSON parse failed — using fallback")
         return {
-            "tweet_1"      : f"🔍 FACT CHECK: {headline[:200]}",
+            "tweet_1"      : f"FACT CHECK: {headline[:200]}",
             "tweet_2"      : f"Verdict: {verdict} | Confidence: {confidence_score}/100",
             "tweet_3"      : "Full analysis in our bio link. Follow for more fact-checks.",
             "editor_notes" : "Fallback used due to JSON parse error"
@@ -141,7 +119,7 @@ def validate_and_fix_tweets(thread: dict) -> dict:
     This is a self-correcting loop — a key agentic pattern!
     """
 
-    print("  📏 Validating tweet lengths...")
+    print("Validating tweet lengths...")
 
     tweets_to_fix = {}
 
@@ -154,15 +132,11 @@ def validate_and_fix_tweets(thread: dict) -> dict:
                 "text"    : tweet,
                 "overlaps": char_count - 280
             }
-            print(f"  ⚠️  {key} is {char_count} chars — needs trimming")
+            print(f"{key} is {char_count} chars — needs trimming")
         else:
-            print(f"  ✅ {key} is {char_count} chars — good")
-
-    # If nothing needs fixing, return as-is
+            print(f"{key} is {char_count} chars — good")
     if not tweets_to_fix:
         return thread
-
-    # Ask LLM to fix the overlong tweets
     print("  🔧 Fixing overlong tweets...")
 
     fix_prompt = f"""
@@ -186,7 +160,7 @@ Current versions of all tweets:
             {"role": "system", "content": "You are a precise copy editor. Shorten tweets to under 280 characters without changing their meaning or tone. Return only valid JSON."},
             {"role": "user",   "content": fix_prompt}
         ],
-        temperature=0.3,    # lower for editing — we want precision
+        temperature=0.3,
         max_tokens=600
     )
 
@@ -195,11 +169,10 @@ Current versions of all tweets:
 
     try:
         fixed = json.loads(raw)
-        # Merge fixes back into original thread
         thread.update(fixed)
         return thread
     except json.JSONDecodeError:
-        return thread   # return original if fix also fails
+        return thread
 
 
 def format_final_output(thread: dict, verdict: str, confidence_score: int) -> str:
@@ -207,7 +180,6 @@ def format_final_output(thread: dict, verdict: str, confidence_score: int) -> st
     Formats the thread dict into a pretty printable string.
     """
 
-    # Verdict gets an emoji
     verdict_emoji = {
         "VERIFIED"   : "✅",
         "MISLEADING" : "⚠️",
@@ -236,7 +208,7 @@ TWEET 3 ({len(thread.get('tweet_3', ''))} chars):
 {thread.get('tweet_3', '')}
 
 ─────────────────────────────────────────────────
-📝 EDITOR NOTES: {thread.get('editor_notes', 'None')}
+EDITOR NOTES: {thread.get('editor_notes', 'None')}
 """
     return output
 
@@ -269,7 +241,7 @@ def run_editor(fact_checker_output: dict) -> dict:
     """
 
     print(f"\n{'='*60}")
-    print(f"✍️  EDITOR AGENT STARTING")
+    print(f"EDITOR AGENT STARTING")
     print(f"{'='*60}\n")
 
     headline          = fact_checker_output["headline"]
@@ -277,7 +249,6 @@ def run_editor(fact_checker_output: dict) -> dict:
     confidence_score  = fact_checker_output["confidence_score"]
     verdict           = fact_checker_output["verdict"]
 
-    # ── PHASE 1: Generate the draft ──────────────
     thread = generate_thread_draft(
         headline,
         fact_check_report,
@@ -305,10 +276,6 @@ def run_editor(fact_checker_output: dict) -> dict:
         "formatted_output": formatted
     }
 
-
-# -----------------------------------------------
-# TEST — runs all 3 agents in sequence
-# -----------------------------------------------
 if __name__ == "__main__":
     from agents.researcher   import run_researcher
     from agents.fact_checker import run_fact_checker
